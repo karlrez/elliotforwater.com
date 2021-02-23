@@ -34,6 +34,7 @@
     "contentful-mock": "0.0.4",
     "next": "^10.0.9",
     "next-translate": "^1.0.1",
+    "nprogress": "^0.2.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "request-ip": "^2.1.3"
