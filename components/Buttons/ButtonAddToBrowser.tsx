@@ -4,8 +4,6 @@ import useTranslation from 'next-translate/useTranslation'
 import config from '../../appConfig'
 import { isBrowser, isChrome, isFirefox } from 'react-device-detect'
 
-declare const window: any
-
 const buttonInfo = {
   chrome: {
     url: config.CHROME_EXTENSION_URL,
@@ -17,6 +15,12 @@ const buttonInfo = {
   },
 }
 
+declare global {
+  interface Window {
+    extensionInterface: any
+  }
+}
+
 export default function ButtonAddToBrowser() {
   const { t } = useTranslation()
   const [browserName, setBrowserName] = useState('')
@@ -25,32 +29,23 @@ export default function ButtonAddToBrowser() {
     if (isBrowser && isChrome) {
       /* eslint-disable no-undef */
       if (chrome.runtime) {
-        chrome.runtime.sendMessage(
-          /* eslint-enable no-undef */
-          config.CHROME_EXTENSION_ID,
-          {
-            action: 'id',
-            value: config.CHROME_EXTENSION_ID,
-          },
-          function (response) {
-            if (!response) {
-              return setBrowserName('chrome')
-            }
+        chrome.runtime.sendMessage(config.CHROME_EXTENSION_ID, { message: config.CHROME_EXTENSION_ID }, function (
+          reply
+        ) {
+          if (!reply) {
+            setBrowserName('chrome')
           }
-        )
-      } else {
-        return setBrowserName('chrome')
+        })
       }
+      /* eslint-enable no-undef */
     }
 
     if (isFirefox) {
       // check msg from extension content-script.js
-      window.addEventListener('message', function (event) {
-        const { source, data } = event
-        if (source === window && data?.target === 'content-script-ff' && data?.message !== 'installed') {
-          setBrowserName('firefox')
-        }
-      })
+      // if extension is NOT installed
+      if (!window.extensionInterface) {
+        setBrowserName('firefox')
+      }
     }
   }, [])
 
