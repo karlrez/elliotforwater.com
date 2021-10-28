@@ -3,6 +3,7 @@ import dynamic from 'next/dynamic'
 import useTranslation from 'next-translate/useTranslation'
 import { isChrome } from 'react-device-detect'
 import { documentToReactComponents } from '@contentful/rich-text-react-renderer'
+import ReactMarkdown from 'react-markdown'
 import { FiArrowDownCircle } from 'react-icons/fi'
 import classnames from 'classnames'
 import fetchContenful from '../helpers/_fetchContentful'
@@ -12,6 +13,7 @@ import ButtonAddToBrowser from '../components/Buttons/ButtonAddToBrowser'
 import Loader from '../components/Loader/Loader'
 import Card from '../components/Card/Card'
 import SubscribeForm from '../components/Forms/Subscribe/SubscribeForm'
+import Accordion from '../components/Accordion/Accordion'
 
 import styles from './index.module.css'
 
@@ -68,7 +70,16 @@ Home.getInitialProps = async () => {
         	json,
         },
       },
-    	newsletterTitle
+      faqTitle
+      faqListCollection {
+        items {
+          title,
+          text,
+          tags
+        }
+      },
+    	newsletterTitle,
+      newsletterDescription
   }    
 }`
   )
@@ -112,7 +123,10 @@ function Home({ homePage }) {
     howItWorksDescription,
     howItWorksCardsCollection,
     waterGoal,
+    faqTitle,
+    faqListCollection,
     newsletterTitle,
+    newsletterDescription,
   } = homePage
 
   return (
@@ -231,9 +245,21 @@ function Home({ homePage }) {
             </div>
           </section>
 
+          <section className={classnames(styles.sections, styles.accordionSection)}>
+            <div className={styles.centerBox}>
+              <h2>{faqTitle}</h2>
+              <div className={styles.accordionWrap}>
+                <Accordion list={faqListCollection.items} />
+              </div>
+            </div>
+          </section>
+
           <section className={classnames(styles.sections, styles.newsletterSection)}>
             <div className={styles.centerBox}>
               <h2>{newsletterTitle}</h2>
+              <p className={styles.newsletterDescription}>
+                <ReactMarkdown>{newsletterDescription}</ReactMarkdown>
+              </p>
               <div className='divider' />
               <SubscribeForm
                 big
